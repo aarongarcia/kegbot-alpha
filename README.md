@@ -1,10 +1,13 @@
-# kegbot-alpha
+#kegbot-alpha
 
-Initial commit...
+#Initial commit...
 
-To-Do list:
+#To-Do list:
 
-• memory optimization
-• redo countdown timer
-• program reset button
-• hookup pressure switch for cycle end
+##memory optimization
+
+##redo countdown timer
+
+##program reset button
+
+##hookup pressure switch for cycle end

@@ -68,7 +68,7 @@ const byte valve1 = A2;              // Relay 2
 const byte valve2 = A3;              // Relay 3
 const byte valve3 = 2;               // Relay 4
 const byte valve4 = 5;               // Relay 5
-const byte c02 = 3;                	 // Relay 6
+const byte co2 = 3;                	 // Relay 6
 
 // const int resetBtn = 4;           // ...does 4 even work?
 const byte buzzer = 6;               // buzzer connected to D6 
@@ -78,15 +78,15 @@ const byte buzzer = 6;               // buzzer connected to D6
 // in seconds
 
 const byte Stage1_duration = 18;	// Purge to drain
-const byte Stage2_duration = 10;	// Purge with C02 1
+const byte Stage2_duration = 10;	// Purge with co2 1
 const byte Stage3_duration = 20;	// Rinse 1
-const byte Stage4_duration = 25;	// Purge with C02 2
+const byte Stage4_duration = 25;	// Purge with co2 2
 const byte Stage5_duration = 20;	// Rinse 2
-const byte Stage6_duration = 30;	// Purge with C02 3
+const byte Stage6_duration = 30;	// Purge with co2 3
 const byte Stage7_duration = 45;	// Recir with Acid
-const byte Stage8_duration = 35;	// Purge acid back to tank with C02
+const byte Stage8_duration = 35;	// Purge acid back to tank with co2
 const byte Stage9_duration = 10;	// Rinse 3
-const byte Stage10_duration = 35;	// Purge with C02 4
+const byte Stage10_duration = 35;	// Purge with co2 4
 const byte Stage11_duration = 10;	// Pressurize keg
 const byte Stage12_duration = 1;	// Stop/Reset
 
@@ -138,7 +138,7 @@ void setup(void) {
 	pinMode(valve2, OUTPUT);
 	pinMode(valve3, OUTPUT);
 	pinMode(valve4, OUTPUT);	
-	pinMode(c02, OUTPUT);	
+	pinMode(co2, OUTPUT);	
 
 	pinMode(buzzer, OUTPUT);	
 
@@ -150,19 +150,14 @@ void setup(void) {
 	pinMode(valve2, HIGH );	
 	pinMode(valve3, HIGH );
 	pinMode(valve4, HIGH );
-	pinMode(c02, HIGH );
+	pinMode(co2, HIGH );
 
 	// pinMode(resetBtn, LOW );	
 	pinMode(startBtn, LOW );
 
 	pinMode(buzzer, HIGH );
 
-	digitalWrite(pump, 1 );
-	digitalWrite(valve1, 1 );
-	digitalWrite(valve2, 1 );
-	digitalWrite(valve3, 1 );
-	digitalWrite(valve4, 1 );
-	digitalWrite(c02, 1 );
+	doCo2Pressure();
 	digitalWrite(buzzer, 1 );
 	
 // clock bizness
@@ -203,6 +198,16 @@ void setup(void) {
 	tft.initR(INITR_BLACKTAB);   // initialize a ST7735S chip, black tab
 
 	tft.fillScreen(ST7735_BLACK); // Clear screen
+	tft.setTextSize(1);
+
+	tft.setTextColor(ST7735_RED);
+	tft.setCursor(5,10);
+	tft.println("Small Brewpub");
+	tft.setCursor(5,20);
+	tft.println("Keg Washer");
+	tft.setCursor(5,30);
+	tft.setTextColor(ST7735_WHITE);
+	tft.println("v.Alpha");
 
 }
 
@@ -210,45 +215,7 @@ void loop() {
 	
 	DateTime now = RTC.now(); //GRAB DATE AND TIME FROM RTC
 	
-	tft.setCursor(5,10);
-	tft.setTextColor(ST7735_RED);
-	tft.setTextSize(1);
-	tft.println("Small Brewpub");
-	tft.setCursor(5,20);
-	tft.println("Keg Washer");
-	tft.setCursor(5,30);
-	tft.setTextColor(ST7735_WHITE);
-	tft.println("v.Alpha");
-	tft.setTextColor(ST7735_YELLOW,ST7735_BLACK);//set text color & size for  DATE coming from TinyRTC
-	tft.setTextSize(1);
-	tft.setCursor(5,50);
-	tft.print(now.year(), DEC);
-	tft.print('/');
-	tft.print(now.month(), DEC);
-	tft.print('/');
-	tft.print(now.day(), DEC);
-	tft.println(' ');
-	tft.setCursor(5,70);
-	tft.setTextColor(ST7735_GREEN,ST7735_BLACK); //set color for TIME
-	tft.setTextSize(1);//set text  size for  TIME coming from TinyRTC
-	tft.print(now.hour(), DEC);
-	tft.print(':');
-	if(now.minute() < 10) { //PRINT A 0 IN FRONT OF THE MINUTE IF LESS THAN 10
-		tft.print('0');
-		tft.print(now.minute(), DEC);
-		}
-	else {
-		tft.print(now.minute(), DEC);
-		}
-	tft.print(':');
-	if(now.second() < 10) {//PRINT A 0 IN FRONT OF THE SECONDS IF LESS THAN 10
-		tft.print('0');
-		tft.print(now.second(), DEC);
-		}
-	else {
-		tft.print(now.second(), DEC);
-		}
-	tft.println(" ");
+	displayTime(now);
 	
 	// tft.setCursor(7,148);
 	// tft.setTextColor(ST7735_RED,ST7735_BLACK);
@@ -305,7 +272,6 @@ unsigned long startSeconds = (startTime.hour() * 60 * 60) + (startTime.minute() 
 			if (buttonState == HIGH) {
 				tft.setCursor(5,90);
 				tft.setTextColor(ST7735_CYAN,ST7735_BLACK); //set color for TIME
-				tft.setTextSize(1);
 				tft.println("");
 				tft.setCursor(5,90);
 				tft.println("Wash Cycle Running");
@@ -318,7 +284,7 @@ unsigned long startSeconds = (startTime.hour() * 60 * 60) + (startTime.minute() 
 				digitalWrite(valve2, 1 );
 				digitalWrite(valve3, 0 );
 				digitalWrite(valve4, 1 );
-				digitalWrite(c02, 1 );
+				digitalWrite(co2, 1 );
 
 				status_display.writeDigitNum(4, 0); // Ideally needs to display the cycle number
 				status_display.writeDisplay();
@@ -359,12 +325,7 @@ unsigned long startSeconds = (startTime.hour() * 60 * 60) + (startTime.minute() 
 				tft.println("Stage 1");
 
 				// Purge 1
-				digitalWrite(pump, 1 );
-				digitalWrite(valve1, 1 );
-				digitalWrite(valve2, 1 );
-				digitalWrite(valve3, 0 );
-				digitalWrite(valve4, 1 );
-				digitalWrite(c02, 0 );
+				doPurge();
 
 				status_display.writeDigitNum(4, 1); // Ideally needs to display the cycle number
 				status_display.writeDisplay();
@@ -376,12 +337,7 @@ unsigned long startSeconds = (startTime.hour() * 60 * 60) + (startTime.minute() 
 				tft.println("Stage 2");	
 
 				// Rinse 1
-				digitalWrite(pump, 1 );
-				digitalWrite(valve1, 0 );
-				digitalWrite(valve2, 1 );
-				digitalWrite(valve3, 0 );
-				digitalWrite(valve4, 1 );
-				digitalWrite(c02, 1 );
+				doRinse();
 
 				status_display.writeDigitNum(4, 2); // Ideally needs to display the cycle number
 				status_display.writeDisplay();
@@ -393,12 +349,7 @@ unsigned long startSeconds = (startTime.hour() * 60 * 60) + (startTime.minute() 
 				tft.println("Stage 3");	
 
 				// Purge 2
-				digitalWrite(pump, 1 );
-				digitalWrite(valve1, 1 );
-				digitalWrite(valve2, 1 );
-				digitalWrite(valve3, 0 );
-				digitalWrite(valve4, 1 );
-				digitalWrite(c02, 0 );
+				doPurge();
 
 				status_display.writeDigitNum(4, 3); // Ideally needs to display the cycle number
 				status_display.writeDisplay();
@@ -410,12 +361,7 @@ unsigned long startSeconds = (startTime.hour() * 60 * 60) + (startTime.minute() 
 				tft.println("Stage 4");	
 
 				// Rinse 2
-				digitalWrite(pump, 1 );
-				digitalWrite(valve1, 0 );
-				digitalWrite(valve2, 1 );
-				digitalWrite(valve3, 0 );
-				digitalWrite(valve4, 1 );
-				digitalWrite(c02, 1 );
+				doRinse();
 
 				status_display.writeDigitNum(4, 4); // Ideally needs to display the cycle number
 				status_display.writeDisplay();
@@ -427,12 +373,7 @@ unsigned long startSeconds = (startTime.hour() * 60 * 60) + (startTime.minute() 
 				tft.println("Stage 5");	
 
 				// Purge 3
-				digitalWrite(pump, 1 );
-				digitalWrite(valve1, 1 );
-				digitalWrite(valve2, 1 );
-				digitalWrite(valve3, 0 );
-				digitalWrite(valve4, 1 );
-				digitalWrite(c02, 0 );
+				doPurge();
 
 				status_display.writeDigitNum(4, 5); // Ideally needs to display the cycle number
 				status_display.writeDisplay();
@@ -445,12 +386,7 @@ unsigned long startSeconds = (startTime.hour() * 60 * 60) + (startTime.minute() 
 				tft.println("Stage 6");	
 
 				// Acid Recirc
-				digitalWrite(pump, 0 );
-				digitalWrite(valve1, 1 );
-				digitalWrite(valve2, 0 );
-				digitalWrite(valve3, 1 );
-				digitalWrite(valve4, 0 );
-				digitalWrite(c02, 1 );		
+				doAcidRecirc();		
 
 				status_display.writeDigitNum(4, 6); // Ideally needs to display the cycle number
 				status_display.writeDisplay();
@@ -462,12 +398,7 @@ unsigned long startSeconds = (startTime.hour() * 60 * 60) + (startTime.minute() 
 				tft.println("Stage 7");	
 
 				// Acid purge
-				digitalWrite(pump, 1 );
-				digitalWrite(valve1, 1 );
-				digitalWrite(valve2, 1 );
-				digitalWrite(valve3, 1 );
-				digitalWrite(valve4, 0 );
-				digitalWrite(c02, 0 );		
+				doAcidPurge();	
 
 				status_display.writeDigitNum(4, 7); // Ideally needs to display the cycle number
 				status_display.writeDisplay();
@@ -479,12 +410,7 @@ unsigned long startSeconds = (startTime.hour() * 60 * 60) + (startTime.minute() 
 				tft.println("Stage 8");	
 
 				// final rinse
-				digitalWrite(pump, 1 );
-				digitalWrite(valve1, 0 );
-				digitalWrite(valve2, 1 );
-				digitalWrite(valve3, 0 );
-				digitalWrite(valve4, 1 );
-				digitalWrite(c02, 0 );		
+				doRinse();	
 
 				status_display.writeDigitNum(4, 8); // Ideally needs to display the cycle number
 				status_display.writeDisplay();
@@ -496,12 +422,7 @@ unsigned long startSeconds = (startTime.hour() * 60 * 60) + (startTime.minute() 
 				tft.println("Stage 9");	
 
 				// purge
-				digitalWrite(pump, 1 );
-				digitalWrite(valve1, 1 );
-				digitalWrite(valve2, 1 );
-				digitalWrite(valve3, 0 );
-				digitalWrite(valve4, 1 );
-				digitalWrite(c02, 0 );		
+				doPurge();		
 
 				status_display.writeDigitNum(4, 9); // Ideally needs to display the cycle number
 				status_display.writeDisplay();
@@ -513,12 +434,7 @@ unsigned long startSeconds = (startTime.hour() * 60 * 60) + (startTime.minute() 
 				tft.println("Stage 10");	
 
 				// pause
-				digitalWrite(pump, 1 );
-				digitalWrite(valve1, 1 );
-				digitalWrite(valve2, 1 );
-				digitalWrite(valve3, 0 );
-				digitalWrite(valve4, 1 );
-				digitalWrite(c02, 1 );
+				doPause();
 
 				status_display.writeDigitNum(3, 1); // Ideally needs to display the cycle number
 				status_display.writeDigitNum(4, 0); // Ideally needs to display the cycle number
@@ -532,12 +448,7 @@ unsigned long startSeconds = (startTime.hour() * 60 * 60) + (startTime.minute() 
 				tft.println("Stage 11");	
 
 				// pressure
-				digitalWrite(pump, 1 );
-				digitalWrite(valve1, 1 );
-				digitalWrite(valve2, 1 );
-				digitalWrite(valve3, 1 );
-				digitalWrite(valve4, 1 );
-				digitalWrite(c02, 0 );
+				doPressure();
 
 
 				status_display.writeDigitNum(3, 1); // Ideally needs to display the cycle number
@@ -554,12 +465,7 @@ unsigned long startSeconds = (startTime.hour() * 60 * 60) + (startTime.minute() 
 				tft.println("DONE                ");
 
 				// pressure
-				digitalWrite(pump, 1 );
-				digitalWrite(valve1, 1 );
-				digitalWrite(valve2, 1 );
-				digitalWrite(valve3, 1 );
-				digitalWrite(valve4, 1 );
-				digitalWrite(c02, 1 );
+				doCo2Pressure();
 
 				digitalWrite(buzzer, 0 );
 				delay(500);                  
@@ -577,6 +483,96 @@ unsigned long startSeconds = (startTime.hour() * 60 * 60) + (startTime.minute() 
 	// it'll be the lastButtonState:
 	lastButtonState = reading_start;
 
+}
+
+
+void doPurge() {
+	digitalWrite(pump, HIGH);
+	digitalWrite(valve1, HIGH);
+	digitalWrite(valve2, HIGH);
+	digitalWrite(valve3, LOW);
+	digitalWrite(valve4, HIGH);
+	digitalWrite(co2, LOW);
+}
+void doRinse() {
+	digitalWrite(pump, HIGH);
+	digitalWrite(valve1, LOW);
+	digitalWrite(valve2, HIGH);
+	digitalWrite(valve3, LOW);
+	digitalWrite(valve4, HIGH);
+	digitalWrite(co2, HIGH);
+}
+void doPressure() {
+	digitalWrite(pump, HIGH);
+	digitalWrite(valve1, HIGH);
+	digitalWrite(valve2, HIGH);
+	digitalWrite(valve3, HIGH);
+	digitalWrite(valve4, HIGH);
+	digitalWrite(co2, LOW);
+}
+void doCo2Pressure() {
+	digitalWrite(pump, HIGH);
+	digitalWrite(valve1, HIGH);
+	digitalWrite(valve2, HIGH);
+	digitalWrite(valve3, HIGH);
+	digitalWrite(valve4, HIGH);
+	digitalWrite(co2, HIGH);
+}
+void doAcidRecirc() {
+	digitalWrite(pump, LOW);
+	digitalWrite(valve1, HIGH);
+	digitalWrite(valve2, LOW);
+	digitalWrite(valve3, HIGH);
+	digitalWrite(valve4, LOW);
+	digitalWrite(co2, HIGH);
+}
+void doAcidPurge() {
+	digitalWrite(pump, HIGH);
+	digitalWrite(valve1, HIGH);
+	digitalWrite(valve2, HIGH);
+	digitalWrite(valve3, HIGH);
+	digitalWrite(valve4, LOW);
+	digitalWrite(co2, LOW);
+}
+void doPause() {
+	digitalWrite(pump, HIGH);
+	digitalWrite(valve1, HIGH);
+	digitalWrite(valve2, HIGH);
+	digitalWrite(valve3, LOW);
+	digitalWrite(valve4, HIGH);
+	digitalWrite(co2, HIGH);
+}
+
+
+void displayTime(DateTime &now) {
+	tft.setTextColor(ST7735_YELLOW,ST7735_BLACK);//set text color & size for  DATE coming from TinyRTC
+	tft.setCursor(5,50);
+	tft.print(now.year(), DEC);
+	tft.print('/');
+	tft.print(now.month(), DEC);
+	tft.print('/');
+	tft.print(now.day(), DEC);
+	tft.println(' ');
+	tft.setCursor(5,70);
+	tft.setTextColor(ST7735_GREEN,ST7735_BLACK); //set color for TIME
+	tft.print(now.hour(), DEC);
+	tft.print(':');
+	if(now.minute() < 10) { //PRINT A 0 IN FRONT OF THE MINUTE IF LESS THAN 10
+		tft.print('0');
+		tft.print(now.minute(), DEC);
+		}
+	else {
+		tft.print(now.minute(), DEC);
+		}
+	tft.print(':');
+	if(now.second() < 10) {//PRINT A 0 IN FRONT OF THE SECONDS IF LESS THAN 10
+		tft.print('0');
+		tft.print(now.second(), DEC);
+		}
+	else {
+		tft.print(now.second(), DEC);
+		}
+	tft.println(" ");
 }
 
 
@@ -653,4 +649,3 @@ unsigned long startSeconds = (startTime.hour() * 60 * 60) + (startTime.minute() 
 //  #define  ST7735_YELLOW  0xFFE0  
 //  #define  ST7735_WHITE   0xFFFF
 //  
-

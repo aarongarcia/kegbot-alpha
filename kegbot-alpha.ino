@@ -15,10 +15,10 @@ Additional Help by Bo Bartlett
 
 // #include <EEPROM.h>
 // #include "writeAnything.h"
+// #include <Wire.h>
 #include <Adafruit_GFX.h>    // Core graphics library
 #include <Adafruit_ST7735.h> // Hardware-specific library
 #include <SPI.h>
-#include <Wire.h>
 #include "RTClib.h"
 #include "Adafruit_LEDBackpack.h"
 
@@ -176,22 +176,20 @@ void setup(void) {
 	status_display.writeDigitRaw(1,64);
 	status_display.writeDigitRaw(3,64);
 	status_display.writeDisplay();
-	
-	// Serial.begin(9600);  // turned off to free up pins 0 and 1
 
- // Manual Clock Set, it will set to this on upload, should only have to do this once.
- // Wire.beginTransmission(0x68); // address DS3231
- // Wire.write(0x00); // select register
- 
- // Wire.write(0x15); // seconds (BCD)
- // Wire.write(0x54); // minutes (BCD)
- // Wire.write(0x11); // hours (BCD)
- // Wire.write(0x04); // day of week (I use Mon=1 .. Sun=7)
- // Wire.write(0x12); // day of month (BCD)
- // Wire.write(0x01); // month (BCD)
- // Wire.write(0x17); // year (BCD, two digits)
- 
- // Wire.endTransmission();
+		// Manual Clock Set, it will set to this on upload, should only have to do this once.
+		// Wire.beginTransmission(0x68); // address DS3231
+		// Wire.write(0x00); // select register
+
+		// Wire.write(0x15); // seconds (BCD)
+		// Wire.write(0x54); // minutes (BCD)
+		// Wire.write(0x11); // hours (BCD)
+		// Wire.write(0x04); // day of week (I use Mon=1 .. Sun=7)
+		// Wire.write(0x12); // day of month (BCD)
+		// Wire.write(0x01); // month (BCD)
+		// Wire.write(0x17); // year (BCD, two digits)
+
+		// Wire.endTransmission();
 
 	RTC.begin(); // initialize a tinyRTC chip
 
@@ -222,7 +220,6 @@ void loop() {
 	// tft.print("Kegs Washed: ");
 	// tft.print(kegsWashedSession);
 
-
 	// button stuff
 
 	// read the state of the switch into a local variable:
@@ -249,7 +246,6 @@ unsigned long nowSeconds = (now.hour() * 60 * 60) + (now.minute() * 60) + now.se
 unsigned long startSeconds = (startTime.hour() * 60 * 60) + (startTime.minute() * 60) + startTime.second();
 
 // int fromStart = nowSeconds - startSeconds;
-
 // int countDown = Stage10 - fromStart;
 
 
@@ -262,226 +258,221 @@ unsigned long startSeconds = (startTime.hour() * 60 * 60) + (startTime.minute() 
 // // duration SECONDS as a decimal only
 // int totalTimeSec = (( totalTimeMin - totalTimeMinOnly ) * 60);
 
-
 // int finalTime = (totalTimeMinOnly *100) + totalTimeSec;
 
-	if ((millis() - lastDebounceTime) > debounceDelay) {
-		// whatever the reading is at, it's been there for longer than the debounce delay, so take it as the actual current state:
-		if (reading_start != buttonState) {
-			buttonState = reading_start;
-			if (buttonState == HIGH) {
-				tft.setCursor(5,90);
-				tft.setTextColor(ST7735_CYAN,ST7735_BLACK); //set color for TIME
-				tft.println("");
-				tft.setCursor(5,90);
-				tft.println("Wash Cycle Running");
-				
-				// kegsWashedSession++;
+if ((millis() - lastDebounceTime) > debounceDelay) {
+	// whatever the reading is at, it's been there for longer than the debounce delay, so take it as the actual current state:
+	if (reading_start != buttonState) {
+		buttonState = reading_start;
+		if (buttonState == HIGH) {
+			tft.setCursor(5,90);
+			tft.setTextColor(ST7735_CYAN,ST7735_BLACK); //set color for TIME
+			tft.println("");
+			tft.setCursor(5,90);
+			
+			// kegsWashedSession++;
 
-				// Purge 1
-				digitalWrite(pump, 1 );
-				digitalWrite(valve1, 1 );
-				digitalWrite(valve2, 1 );
-				digitalWrite(valve3, 0 );
-				digitalWrite(valve4, 1 );
-				digitalWrite(co2, 1 );
+			// Purge 1
+			digitalWrite(pump, 1 );
+			digitalWrite(valve1, 1 );
+			digitalWrite(valve2, 1 );
+			digitalWrite(valve3, 0 );
+			digitalWrite(valve4, 1 );
+			digitalWrite(co2, 1 );
 
-				status_display.writeDigitNum(4, 0); // Ideally needs to display the cycle number
-				status_display.writeDisplay();
+			status_display.writeDigitNum(4, 0); // Ideally needs to display the cycle number
+			status_display.writeDisplay();
 
-				startTime = RTC.now();
-				
-				// currentStage = 0;
+			startTime = RTC.now();
+			
+			// currentStage = 0;
 
-				tft.setCursor(5,100);
-				tft.print("Timestamp: ");
-				tft.print(startTime.hour(), DEC);
-				tft.print(':');
-				if(startTime.minute() < 10) { //PRINT A 0 IN FRONT OF THE MINUTE IF LESS THAN 10
-					tft.print('0');
-					tft.print(startTime.minute(), DEC);
-					}
-				else {
-					tft.print(startTime.minute(), DEC);
-					}
-				tft.print(':');
-				if(startTime.second() < 10) {//PRINT A 0 IN FRONT OF THE SECONDS IF LESS THAN 10
-					tft.print('0');
-					tft.print(startTime.second(), DEC);
-					}
-				else {
-					tft.print(startTime.second(), DEC);
-					}
-				tft.println(" ");
+			tft.setCursor(5,100);
+			tft.print(startTime.hour(), DEC);
+			tft.print(':');
+			if(startTime.minute() < 10) { //PRINT A 0 IN FRONT OF THE MINUTE IF LESS THAN 10
+				tft.print('0');
+				tft.print(startTime.minute(), DEC);
 				}
+			else {
+				tft.print(startTime.minute(), DEC);
+				}
+			tft.print(':');
+			if(startTime.second() < 10) {//PRINT A 0 IN FRONT OF THE SECONDS IF LESS THAN 10
+				tft.print('0');
+				tft.print(startTime.second(), DEC);
+				}
+			else {
+				tft.print(startTime.second(), DEC);
+				}
+			tft.println(" ");
+			}
+		}
+
+		tft.setTextColor(ST7735_GREEN,ST7735_BLACK);
+		
+		if(nowSeconds == startSeconds + Stage1) {
+			tft.setCursor(5,115);
+		
+
+			tft.println("Stage 1");
+
+			// Purge 1
+			doPurge();
+
+			status_display.writeDigitNum(4, 1); // Ideally needs to display the cycle number
+			status_display.writeDisplay();
+
 			}
 
-			tft.setTextColor(ST7735_GREEN,ST7735_BLACK);
+		else if(nowSeconds == startSeconds + Stage2) {
+			tft.setCursor(5,115);
+			tft.println("Stage 2");	
+
+			// Rinse 1
+			doRinse();
+
+			status_display.writeDigitNum(4, 2); // Ideally needs to display the cycle number
+			status_display.writeDisplay();
+
+			}
+
+		else if(nowSeconds == startSeconds + Stage3) {
+			tft.setCursor(5,115);
+			tft.println("Stage 3");	
+
+			// Purge 2
+			doPurge();
+
+			status_display.writeDigitNum(4, 3); // Ideally needs to display the cycle number
+			status_display.writeDisplay();
+
+			}
+
+		else if(nowSeconds == startSeconds + Stage4) {
+			tft.setCursor(5,115);
+			tft.println("Stage 4");	
+
+			// Rinse 2
+			doRinse();
+
+			status_display.writeDigitNum(4, 4); // Ideally needs to display the cycle number
+			status_display.writeDisplay();
+
+			}
+
+		else if(nowSeconds == startSeconds + Stage5) {
+			tft.setCursor(5,115);
+			tft.println("Stage 5");	
+
+			// Purge 3
+			doPurge();
+
+			status_display.writeDigitNum(4, 5); // Ideally needs to display the cycle number
+			status_display.writeDisplay();
+
+			}
+
+
+		else if(nowSeconds == startSeconds + Stage6) {
+			tft.setCursor(5,115);
+			tft.println("Stage 6");	
+
+			// Acid Recirc
+			doAcidRecirc();		
+
+			status_display.writeDigitNum(4, 6); // Ideally needs to display the cycle number
+			status_display.writeDisplay();
+
+			}
+
+		else if(nowSeconds == startSeconds + Stage7) {
+			tft.setCursor(5,115);
+			tft.println("Stage 7");	
+
+			// Acid purge
+			doAcidPurge();	
+
+			status_display.writeDigitNum(4, 7); // Ideally needs to display the cycle number
+			status_display.writeDisplay();
+
+			}
+
+		else if(nowSeconds == startSeconds + Stage8) {
+			tft.setCursor(5,115);
+			tft.println("Stage 8");	
+
+			// final rinse
+			doRinse();	
+
+			status_display.writeDigitNum(4, 8); // Ideally needs to display the cycle number
+			status_display.writeDisplay();
+
+			}
+
+		else if(nowSeconds == startSeconds + Stage9) {
+			tft.setCursor(5,115);
+			tft.println("Stage 9");	
+
+			// purge
+			doPurge();		
+
+			status_display.writeDigitNum(4, 9); // Ideally needs to display the cycle number
+			status_display.writeDisplay();
+
+			}
+
+		else if(nowSeconds == startSeconds + Stage10) {
+			tft.setCursor(5,115);
+			tft.println("Stage 10");	
+
+			// pause
+			doPause();
+
+			status_display.writeDigitNum(3, 1); // Ideally needs to display the cycle number
+			status_display.writeDigitNum(4, 0); // Ideally needs to display the cycle number
+			status_display.writeDisplay();
+
+			}
+
+		else if(nowSeconds == startSeconds + Stage11) {
+			tft.setCursor(5,115);
+			tft.println("Stage 11");	
+
+			// pressure
+			doPressure();
+
+
+			status_display.writeDigitNum(3, 1); // Ideally needs to display the cycle number
+			status_display.writeDigitNum(4, 1); // Ideally needs to display the cycle number
+
+			status_display.writeDisplay();
+
+
+			}
+
+
+		else if(nowSeconds == startSeconds + Stage12) {
+			tft.setCursor(5,115);
+			tft.println("DONE         ");
+
+			// pressure
+			doCo2Pressure();
+
+			digitalWrite(buzzer, 0 );
+			delay(1000);                  
+			digitalWrite(buzzer, 1 );
 			
-			if(nowSeconds == startSeconds + Stage1) {
-				tft.setCursor(5,115);
-			
+			status_display.writeDigitNum(3, 0); // Ideally needs to display the cycle number
+			status_display.writeDigitNum(4, 0); // Ideally needs to display the cycle number
+			status_display.writeDisplay();
 
-				tft.println("Stage 1");
+			}
 
-				// Purge 1
-				doPurge();
-
-				status_display.writeDigitNum(4, 1); // Ideally needs to display the cycle number
-				status_display.writeDisplay();
-
-				}
-
-			else if(nowSeconds == startSeconds + Stage2) {
-				tft.setCursor(5,115);
-				tft.println("Stage 2");	
-
-				// Rinse 1
-				doRinse();
-
-				status_display.writeDigitNum(4, 2); // Ideally needs to display the cycle number
-				status_display.writeDisplay();
-
-				}
-	
-			else if(nowSeconds == startSeconds + Stage3) {
-				tft.setCursor(5,115);
-				tft.println("Stage 3");	
-
-				// Purge 2
-				doPurge();
-
-				status_display.writeDigitNum(4, 3); // Ideally needs to display the cycle number
-				status_display.writeDisplay();
-
-				}
-
-			else if(nowSeconds == startSeconds + Stage4) {
-				tft.setCursor(5,115);
-				tft.println("Stage 4");	
-
-				// Rinse 2
-				doRinse();
-
-				status_display.writeDigitNum(4, 4); // Ideally needs to display the cycle number
-				status_display.writeDisplay();
-
-				}
-
-			else if(nowSeconds == startSeconds + Stage5) {
-				tft.setCursor(5,115);
-				tft.println("Stage 5");	
-
-				// Purge 3
-				doPurge();
-
-				status_display.writeDigitNum(4, 5); // Ideally needs to display the cycle number
-				status_display.writeDisplay();
-
-				}
-
-
-			else if(nowSeconds == startSeconds + Stage6) {
-				tft.setCursor(5,115);
-				tft.println("Stage 6");	
-
-				// Acid Recirc
-				doAcidRecirc();		
-
-				status_display.writeDigitNum(4, 6); // Ideally needs to display the cycle number
-				status_display.writeDisplay();
-
-				}
-
-			else if(nowSeconds == startSeconds + Stage7) {
-				tft.setCursor(5,115);
-				tft.println("Stage 7");	
-
-				// Acid purge
-				doAcidPurge();	
-
-				status_display.writeDigitNum(4, 7); // Ideally needs to display the cycle number
-				status_display.writeDisplay();
-
-				}
-
-			else if(nowSeconds == startSeconds + Stage8) {
-				tft.setCursor(5,115);
-				tft.println("Stage 8");	
-
-				// final rinse
-				doRinse();	
-
-				status_display.writeDigitNum(4, 8); // Ideally needs to display the cycle number
-				status_display.writeDisplay();
-
-				}
-
-			else if(nowSeconds == startSeconds + Stage9) {
-				tft.setCursor(5,115);
-				tft.println("Stage 9");	
-
-				// purge
-				doPurge();		
-
-				status_display.writeDigitNum(4, 9); // Ideally needs to display the cycle number
-				status_display.writeDisplay();
-
-				}
-
-			else if(nowSeconds == startSeconds + Stage10) {
-				tft.setCursor(5,115);
-				tft.println("Stage 10");	
-
-				// pause
-				doPause();
-
-				status_display.writeDigitNum(3, 1); // Ideally needs to display the cycle number
-				status_display.writeDigitNum(4, 0); // Ideally needs to display the cycle number
-				status_display.writeDisplay();
-
-
-				}
-
-			else if(nowSeconds == startSeconds + Stage11) {
-				tft.setCursor(5,115);
-				tft.println("Stage 11");	
-
-				// pressure
-				doPressure();
-
-
-				status_display.writeDigitNum(3, 1); // Ideally needs to display the cycle number
-				status_display.writeDigitNum(4, 1); // Ideally needs to display the cycle number
-
-				status_display.writeDisplay();
-
-
-				}
-
-
-			else if(nowSeconds == startSeconds + Stage12) {
-				tft.setCursor(5,115);
-				tft.println("DONE                ");
-
-				// pressure
-				doCo2Pressure();
-
-				digitalWrite(buzzer, 0 );
-				delay(500);                  
-				digitalWrite(buzzer, 1 );
-				
-				status_display.writeDigitNum(3, 0); // Ideally needs to display the cycle number
-				status_display.writeDigitNum(4, 0); // Ideally needs to display the cycle number
- 				status_display.writeDisplay();
-
-
-				}
-
-		}
-	// save the reading.  Next time through the loop,
-	// it'll be the lastButtonState:
-	lastButtonState = reading_start;
+	}
+// save the reading.  Next time through the loop,
+// it'll be the lastButtonState:
+lastButtonState = reading_start;
 
 }
 
@@ -545,14 +536,14 @@ void doPause() {
 
 
 void displayTime(DateTime &now) {
-	tft.setTextColor(ST7735_YELLOW,ST7735_BLACK);//set text color & size for  DATE coming from TinyRTC
-	tft.setCursor(5,50);
-	tft.print(now.year(), DEC);
-	tft.print('/');
-	tft.print(now.month(), DEC);
-	tft.print('/');
-	tft.print(now.day(), DEC);
-	tft.println(' ');
+	// tft.setTextColor(ST7735_YELLOW,ST7735_BLACK);//set text color & size for  DATE coming from TinyRTC
+	// tft.setCursor(5,50);
+	// tft.print(now.year(), DEC);
+	// tft.print('/');
+	// tft.print(now.month(), DEC);
+	// tft.print('/');
+	// tft.print(now.day(), DEC);
+	// tft.println(' ');
 	tft.setCursor(5,70);
 	tft.setTextColor(ST7735_GREEN,ST7735_BLACK); //set color for TIME
 	tft.print(now.hour(), DEC);
@@ -575,35 +566,34 @@ void displayTime(DateTime &now) {
 	tft.println(" ");
 }
 
+//----------------------------------------------------------------- 
+// Bit mask codes. These can be used with writeDigitRaw to
+// print various letters and symbols in a digit on the
+// seven segment LED display. 
+// The first argument is the position
+// on the 4-digit display, starting at 0 (far left),
+// ending at 4 (far right), with position 2 being 
+// the colon (so you'll skip this position usually).
+// The second argument is an integer that corresponds
+// to the binary representation of the combination of
+// 7 segments making up each digit. 
+//         0
+//      ------
+//   5  |     | 1
+//      |  6  |
+//      ------ 
+//   4  |     | 2
+//      |     |
+//      ------   o7 
+//         3
+// For example, to make upper case A, you want to 
+// light up segments 0,1,2,4,5,6.     b00110000
+// The binary representation would be b01110111.
+//           The bit positions are -->b76543210
+// The corresponding integer value is 119 for A. 
+// Use a binary-to-decimal calculator to convert.
+// Below is a list of codes for letters and symbols
 
-	//----------------------------------------------------------------- 
-	// Bit mask codes. These can be used with writeDigitRaw to
-	// print various letters and symbols in a digit on the
-	// seven segment LED display. 
-	// The first argument is the position
-	// on the 4-digit display, starting at 0 (far left),
-	// ending at 4 (far right), with position 2 being 
-	// the colon (so you'll skip this position usually).
-	// The second argument is an integer that corresponds
-	// to the binary representation of the combination of
-	// 7 segments making up each digit. 
-	//         0
-	//      ------
-	//   5  |     | 1
-	//      |  6  |
-	//      ------ 
-	//   4  |     | 2
-	//      |     |
-	//      ------   o7 
-	//         3
-	// For example, to make upper case A, you want to 
-	// light up segments 0,1,2,4,5,6.     b00110000
-	// The binary representation would be b01110111.
-	//           The bit positions are -->b76543210
-	// The corresponding integer value is 119 for A. 
-	// Use a binary-to-decimal calculator to convert.
-	// Below is a list of codes for letters and symbols
-	
 //  sevenseg.writeDigitRaw(0,119); // 119 = "A"
 //  sevenseg.writeDigitRaw(0,124); // 124 = "b"
 //  sevenseg.writeDigitRaw(0,57); // 57 = "C"

@@ -260,10 +260,10 @@ if ((millis() - lastDebounceTime) > debounceDelay) {
 	if (reading_start != buttonState) {
 		buttonState = reading_start;
 		if (buttonState == HIGH) {
-			tft.setCursor(5,90);
+			tft.setCursor(5,60);
 			tft.setTextColor(ST7735_CYAN,ST7735_BLACK); //set color for TIME
 			tft.println("");
-			tft.setCursor(5,90);
+			tft.setCursor(5,80);
 			
 			// kegsWashedSession++;
 
@@ -432,7 +432,7 @@ if ((millis() - lastDebounceTime) > debounceDelay) {
 
 		else if(nowSeconds == startSeconds + Stage11) {
 			tft.setCursor(5,115);
-			tft.println("Stage 11");	
+			tft.println("Almost Done...");	
 
 			// pressure
 			doPressure();
@@ -446,7 +446,7 @@ if ((millis() - lastDebounceTime) > debounceDelay) {
 
 		else if(nowSeconds == startSeconds + Stage12) {
 			tft.setCursor(5,115);
-			tft.println("Almost Done...");
+			tft.println("Done          ");
 
 			// pressure
 			doCo2Pressure();
@@ -528,7 +528,7 @@ void doPause() {
 
 
 void displayTime(DateTime &now) {
-	// tft.setTextColor(ST7735_YELLOW,ST7735_BLACK);//set text color & size for  DATE coming from TinyRTC
+	tft.setTextColor(ST7735_YELLOW,ST7735_BLACK);//set text color & size for  DATE coming from TinyRTC
 	// tft.setCursor(5,50);
 	// tft.print(now.year(), DEC);
 	// tft.print('/');

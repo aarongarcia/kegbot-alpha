@@ -16,6 +16,7 @@ Additional Help by Bo Bartlett
 // #include <EEPROM.h>
 // #include "writeAnything.h"
 // #include <Wire.h>
+// #include <avr/wdt.h>
 #include <Adafruit_GFX.h>    // Core graphics library
 #include <Adafruit_ST7735.h> // Hardware-specific library
 #include <SPI.h>
@@ -111,12 +112,6 @@ int lastButtonState = LOW;   // the previous reading from the input pin
 unsigned long lastDebounceTime = 0;  // the last time the output pin was toggled
 const unsigned long debounceDelay = 50;    // the debounce time; increase if the output flickers
 
-/*
-about set time:
-format: year,month,day,week,hour,min,sec
-example: 14,03,25,02,13,55,10   2014.03.25 tuesday 13:55:10
-*/
-
 String comdata = "";
 int mark=0;
 //store the current time data
@@ -125,6 +120,7 @@ int rtc[7];
 byte rr[7];
 
 void setup(void) {
+
 
 // addresses for 4 digit readouts
 
@@ -211,36 +207,35 @@ void setup(void) {
 
 void loop() {  
 	
-	DateTime now = RTC.now(); //GRAB DATE AND TIME FROM RTC
-	
-	displayTime(now);
-	
-	// tft.setCursor(7,148);
-	// tft.setTextColor(ST7735_RED,ST7735_BLACK);
-	// tft.print("Kegs Washed: ");
-	// tft.print(kegsWashedSession);
+DateTime now = RTC.now(); //GRAB DATE AND TIME FROM RTC
 
-	// button stuff
+displayTime(now);
 
-	// read the state of the switch into a local variable:
-	int reading_start = digitalRead(startBtn);
+// tft.setCursor(7,148);
+// tft.setTextColor(ST7735_RED,ST7735_BLACK);
+// tft.print("Kegs Washed: ");
+// tft.print(kegsWashedSession);
 
-	// int reading_reset = digitalRead(resetBtn);
+// button stuff
 
-	// check to see if you just pressed the button
-	// (i.e. the input went from LOW to HIGH),  and you've waited
-	// long enough since the last press to ignore any noise:
+// read the state of the switch into a local variable:
+int reading_start = digitalRead(startBtn);
 
-	// If the switch changed, due to noise or pressing:
-	// resetBtn the debouncing timer
+// int reading_reset = digitalRead(resetBtn);
 
-	if (reading_start != lastButtonState) {
-		lastDebounceTime = millis();
-	}
-	// if (reading_reset != lastButtonState) {
-	// 	lastDebounceTime = millis();
-	// }
+// check to see if you just pressed the button
+// (i.e. the input went from LOW to HIGH),  and you've waited
+// long enough since the last press to ignore any noise:
 
+// If the switch changed, due to noise or pressing:
+// resetBtn the debouncing timer
+
+if (reading_start != lastButtonState) {
+	lastDebounceTime = millis();
+}
+// if (reading_reset != lastButtonState) {
+// 	lastDebounceTime = millis();
+// }
 
 unsigned long nowSeconds = (now.hour() * 60 * 60) + (now.minute() * 60) + now.second();
 unsigned long startSeconds = (startTime.hour() * 60 * 60) + (startTime.minute() * 60) + startTime.second();
@@ -442,25 +437,22 @@ if ((millis() - lastDebounceTime) > debounceDelay) {
 			// pressure
 			doPressure();
 
-
 			status_display.writeDigitNum(3, 1); // Ideally needs to display the cycle number
 			status_display.writeDigitNum(4, 1); // Ideally needs to display the cycle number
-
 			status_display.writeDisplay();
 
 
 			}
 
-
 		else if(nowSeconds == startSeconds + Stage12) {
 			tft.setCursor(5,115);
-			tft.println("DONE         ");
+			tft.println("Almost Done...");
 
 			// pressure
 			doCo2Pressure();
 
 			digitalWrite(buzzer, 0 );
-			delay(1000);                  
+			delay(1000);
 			digitalWrite(buzzer, 1 );
 			
 			status_display.writeDigitNum(3, 0); // Ideally needs to display the cycle number

@@ -307,10 +307,8 @@ if ((millis() - lastDebounceTime) > debounceDelay) {
 		tft.setTextColor(ST7735_GREEN,ST7735_BLACK);
 		
 		if(nowSeconds == startSeconds + Stage1) {
-			tft.setCursor(5,115);
-		
-
-			tft.println("Stage 1");
+			// tft.setCursor(5,115);
+			// tft.println("Stage 1");
 
 			// Purge 1
 			doPurge();
@@ -321,8 +319,8 @@ if ((millis() - lastDebounceTime) > debounceDelay) {
 			}
 
 		else if(nowSeconds == startSeconds + Stage2) {
-			tft.setCursor(5,115);
-			tft.println("Stage 2");	
+			// tft.setCursor(5,115);
+			// tft.println("Stage 2");	
 
 			// Rinse 1
 			doRinse();
@@ -333,8 +331,8 @@ if ((millis() - lastDebounceTime) > debounceDelay) {
 			}
 
 		else if(nowSeconds == startSeconds + Stage3) {
-			tft.setCursor(5,115);
-			tft.println("Stage 3");	
+			// tft.setCursor(5,115);
+			// tft.println("Stage 3");	
 
 			// Purge 2
 			doPurge();
@@ -345,8 +343,8 @@ if ((millis() - lastDebounceTime) > debounceDelay) {
 			}
 
 		else if(nowSeconds == startSeconds + Stage4) {
-			tft.setCursor(5,115);
-			tft.println("Stage 4");	
+			// tft.setCursor(5,115);
+			// tft.println("Stage 4");	
 
 			// Rinse 2
 			doRinse();
@@ -357,8 +355,8 @@ if ((millis() - lastDebounceTime) > debounceDelay) {
 			}
 
 		else if(nowSeconds == startSeconds + Stage5) {
-			tft.setCursor(5,115);
-			tft.println("Stage 5");	
+			// tft.setCursor(5,115);
+			// tft.println("Stage 5");	
 
 			// Purge 3
 			doPurge();
@@ -370,8 +368,8 @@ if ((millis() - lastDebounceTime) > debounceDelay) {
 
 
 		else if(nowSeconds == startSeconds + Stage6) {
-			tft.setCursor(5,115);
-			tft.println("Stage 6");	
+			// tft.setCursor(5,115);
+			// tft.println("Stage 6");	
 
 			// Acid Recirc
 			doAcidRecirc();		
@@ -382,8 +380,8 @@ if ((millis() - lastDebounceTime) > debounceDelay) {
 			}
 
 		else if(nowSeconds == startSeconds + Stage7) {
-			tft.setCursor(5,115);
-			tft.println("Stage 7");	
+			// tft.setCursor(5,115);
+			// tft.println("Stage 7");	
 
 			// Acid purge
 			doAcidPurge();	
@@ -394,8 +392,8 @@ if ((millis() - lastDebounceTime) > debounceDelay) {
 			}
 
 		else if(nowSeconds == startSeconds + Stage8) {
-			tft.setCursor(5,115);
-			tft.println("Stage 8");	
+			// tft.setCursor(5,115);
+			// tft.println("Stage 8");	
 
 			// final rinse
 			doRinse();	
@@ -406,8 +404,8 @@ if ((millis() - lastDebounceTime) > debounceDelay) {
 			}
 
 		else if(nowSeconds == startSeconds + Stage9) {
-			tft.setCursor(5,115);
-			tft.println("Stage 9");	
+			// tft.setCursor(5,115);
+			// tft.println("Stage 9");	
 
 			// purge
 			doPurge();		
@@ -418,8 +416,8 @@ if ((millis() - lastDebounceTime) > debounceDelay) {
 			}
 
 		else if(nowSeconds == startSeconds + Stage10) {
-			tft.setCursor(5,115);
-			tft.println("Stage 10");	
+			// tft.setCursor(5,115);
+			// tft.println("Stage 10");	
 
 			// pause
 			doPause();
@@ -431,8 +429,8 @@ if ((millis() - lastDebounceTime) > debounceDelay) {
 			}
 
 		else if(nowSeconds == startSeconds + Stage11) {
-			tft.setCursor(5,115);
-			tft.println("Almost Done...");	
+			// tft.setCursor(5,115);
+			// tft.println("Almost Done...");	
 
 			// pressure
 			doPressure();
@@ -445,8 +443,8 @@ if ((millis() - lastDebounceTime) > debounceDelay) {
 			}
 
 		else if(nowSeconds == startSeconds + Stage12) {
-			tft.setCursor(5,115);
-			tft.println("Done          ");
+			// tft.setCursor(5,115);
+			// tft.println("Done          ");
 
 			// pressure
 			doCo2Pressure();

@@ -13,7 +13,7 @@ class Small_Cycle
 		String _display;
 		bool _started;
 		bool _completed;
-		unsigned long = _endtime;
+		unsigned long _endtime;
 
 	public:
 		Small_Cycle();

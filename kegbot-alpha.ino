@@ -672,7 +672,7 @@ void displayTime(DateTime &now) {
 void preWash() {
 	// loop through the cycles and set their end times
 	for (int thisCycle = 0; thisCycle <= cyclesCount-1; thisCycle++) {
-		cycles[thisCycle].setEndTime(nowSeconds);
+		cycles[thisCycle].setEndtime(nowSeconds);
 	}
 	tft.setCursor(5,60);
 	tft.setTextColor(ST7735_CYAN,ST7735_BLACK); //set color for TIME
